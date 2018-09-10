@@ -22,14 +22,12 @@ const swapiTypeToGraphQLType = swapiType => {
   }
 }
 
-const idFetcher = globalId => {
+exports.idFetcher = globalId => {
   const {type, id} = fromGlobalId(globalId)
   return getObjectFromTypeAndId(type, id)
 }
 
-const typeResolver = obj => {
+exports.typeResolver = obj => {
   const parts = obj.url.split('/')
   return swapiTypeToGraphQLType(parts[parts.length - 3])
 }
-
-module.exports = {idFetcher, typeResolver}
