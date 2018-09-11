@@ -4,6 +4,9 @@ module.exports = gql`
   "A large mass, planet or planetoid in the Star Wars Universe, at the time of 0 ABY."
   type Planet {
 
+    "The ID of an object."
+    id: ID!
+
     "The name of this planet."
     name: String
 
@@ -30,6 +33,12 @@ module.exports = gql`
 
     "The percentage of the planet surface that is naturally occuring water or bodies of water."
     surfaceWater: Float
+
+    "The ISO 8601 date format of the time that this resource was created."
+    created: String
+
+    "The ISO 8601 date format of the time that this resource was edited."
+    edited: String
   }
 
   extend type Query {

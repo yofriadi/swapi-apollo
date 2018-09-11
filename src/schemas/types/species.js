@@ -4,6 +4,9 @@ module.exports = gql`
   "A type of person or character within the Star Wars Universe."
   type Species {
 
+    "The ID of an object."
+    id: ID!
+
     "The name of this species."
     name: String
 
@@ -33,6 +36,12 @@ module.exports = gql`
 
     "A planet that this species originates from."
     homeWorld: Planet
+
+    "The ISO 8601 date format of the time that this resource was created."
+    created: String
+
+    "The ISO 8601 date format of the time that this resource was edited."
+    edited: String
   }
 
   extend type Query {

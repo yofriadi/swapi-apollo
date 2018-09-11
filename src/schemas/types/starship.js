@@ -4,6 +4,9 @@ module.exports = gql`
   "A single transport craft that has hyperdrive capability."
   type Starship {
 
+    "The ID of an object."
+    id: ID!
+
     "The name of this starship. The common name, such as 'Death Star'."
     name: String
 
@@ -42,6 +45,12 @@ module.exports = gql`
 
     "The maximum length of time that this starship can provide consumables for it's entire crew without having to resupply."
     consumables: String
+
+    "The ISO 8601 date format of the time that this resource was created."
+    created: String
+
+    "The ISO 8601 date format of the time that this resource was edited."
+    edited: String
   }
 
   extend type Query {

@@ -3,7 +3,7 @@ const {gql} = require('apollo-server')
 module.exports = gql`
   "A single film."
   type Film {
-    
+
     "The ID of an object."
     id: ID!
 

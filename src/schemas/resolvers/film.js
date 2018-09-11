@@ -1,22 +1,34 @@
-const {getObjectFromTypeAndId} = require('../../helpers')
-
-const base64 = i => Buffer.from(i, 'utf8').toString('base64')
+const {getObjectFromTypeAndId, arrayList} = require('../../helpers')
+const {toGlobalId, fromGlobalId} = require('../../relay')
 
 module.exports = {
   Query: {
-    film: async (_, args) => {
-      if (args.filmID !== undefined && args.filmID !== null) {
-        return getObjectFromTypeAndId('films', args.filmID)
+    film: (_, {id, filmID}) => {
+      if (id !== undefined && id !== null) {
+        const {type, id: globalId} = fromGlobalId(id);
+
+        if (
+          globalId === null ||
+          globalId === undefined ||
+          globalId === ''
+        ) {
+          throw new Error(`No valid ID extracted from ${id}`)
+        }
+        return getObjectFromTypeAndId(type, globalId)
+      }
+
+      if (filmID !== undefined && filmID !== null) {
+        return getObjectFromTypeAndId('films', filmID)
       }
 
       throw new Error('must provide id or filmID')
     }
   },
   Film: {
-    id: ({id}) => base64(['films', id].join(':')),
+    id: ({id}) => toGlobalId('films', id),
     episodeID: ({episode_id}) => episode_id,
     openingCrawl: ({opening_crawl}) => opening_crawl,
-    producers: ({producer}) => producer.split(', '),
+    producers: ({producer}) => arrayList(producer),
     releaseDate: ({release_date}) => release_date
   }
 }

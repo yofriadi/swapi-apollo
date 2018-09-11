@@ -1,8 +1,8 @@
 const DataLoader = require('dataloader')
-const fetch = require('node-fetch')
-// const getFromLocalUrl = require('./api')
+// const fetch = require('node-fetch')
+const getFromLocalUrl = require('./api')
 
-exports.getObjectFromTypeAndId = async (type, id) =>
+const getObjectFromTypeAndId = async (type, id) =>
   getObjectFromUrl(`https://swapi.co/api/${type}/${id}/`)
 
 const getObjectFromUrl = async url => {
@@ -11,7 +11,7 @@ const getObjectFromUrl = async url => {
 }
 
 const localUrlLoader = new DataLoader(
-  urls => Promise.all(urls.map(fetchSWAPI))
+  urls => Promise.all(urls.map(getFromLocalUrl))
 )
 
 const objectWithId = obj => {
@@ -19,9 +19,17 @@ const objectWithId = obj => {
   return obj
 }
 
-const fetchSWAPI = async url => {
+/* const fetchSWAPI = async url => {
   const data = await fetch(url)
     .then(res => res.json())
     .catch(err => console.error(err))
   return data
+} */
+
+const arrayList = str => str.split(', ')
+
+module.exports = {
+  getObjectFromTypeAndId,
+  getObjectFromUrl,
+  arrayList
 }
