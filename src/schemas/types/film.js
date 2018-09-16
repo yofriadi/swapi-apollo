@@ -1,11 +1,22 @@
 const {gql} = require('apollo-server')
 
+const {commonFields} = require('../../helpers')
+
+const {
+  id,
+  created,
+  edited
+} = commonFields()
+
 module.exports = gql`
   "A single film."
   type Film {
 
-    "The ID of an object."
-    id: ID!
+    ${id}
+
+    ${created}
+
+    ${edited}
 
     "The title of this film."
     title: String
@@ -24,12 +35,6 @@ module.exports = gql`
 
     "The ISO 8601 date format of film release at original creator country."
     releaseDate: String
-
-    "The ISO 8601 date format of the time that this resource was created."
-    created: String
-
-    "The ISO 8601 date format of the time that this resource was edited."
-    edited: String
   }
 
   type Query {

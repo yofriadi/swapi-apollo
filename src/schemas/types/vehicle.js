@@ -1,11 +1,22 @@
 const {gql} = require('apollo-server')
 
+const {commonFields} = require('../../helpers')
+
+const {
+  id,
+  created,
+  edited
+} = commonFields()
+
 module.exports = gql`
   "A single transport craft that does not have hyperdrive capability"
   type Vehicle {
 
-    "The ID of an object."
-    id: ID!
+    ${id}
+
+    ${created}
+
+    ${edited}
 
     "The name of this vehicle. The common name, such as 'Sand Crawler' or 'Speeder bike'."
     name: String
@@ -39,12 +50,6 @@ module.exports = gql`
 
     "The maximum length of time that this vehicle can provide consumables for its entire crew without having to resupply."
     consumables: String
-
-    "The ISO 8601 date format of the time that this resource was created."
-    created: String
-
-    "The ISO 8601 date format of the time that this resource was edited."
-    edited: String
   }
 
   extend type Query {

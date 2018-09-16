@@ -1,11 +1,22 @@
 const {gql} = require('apollo-server')
 
+const {commonFields} = require('../../helpers')
+
+const {
+  id,
+  created,
+  edited
+} = commonFields()
+
 module.exports = gql`
   "A type of person or character within the Star Wars Universe."
   type Species {
 
-    "The ID of an object."
-    id: ID!
+    ${id}
+
+    ${created}
+
+    ${edited}
 
     "The name of this species."
     name: String
@@ -35,13 +46,7 @@ module.exports = gql`
     language: String
 
     "A planet that this species originates from."
-    homeWorld: Planet
-
-    "The ISO 8601 date format of the time that this resource was created."
-    created: String
-
-    "The ISO 8601 date format of the time that this resource was edited."
-    edited: String
+    homeworld: Planet
   }
 
   extend type Query {

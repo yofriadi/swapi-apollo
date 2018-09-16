@@ -24,9 +24,9 @@ const swapiTypeToGraphQLType = swapiType => {
 const base64 = i => Buffer.from(i, 'utf8').toString('base64')
 const unbase64 = i => Buffer.from(i, 'base64').toString('utf8')
 
-exports.toGlobalId = (type, id) => base64([type, id].join(':'))
+const toGlobalId = (type, id) => base64([type, id].join(':'))
 
-exports.fromGlobalId = globalId => {
+const fromGlobalId = globalId => {
   const unbasedGlobalId = unbase64(globalId)
   const delimiterPos = unbasedGlobalId.indexOf(':')
   return {
@@ -35,12 +35,20 @@ exports.fromGlobalId = globalId => {
   }
 }
 
-exports.idFetcher = globalId => {
+const idFetcher = globalId => {
   const {type, id} = fromGlobalId(globalId)
   return getObjectFromTypeAndId(type, id)
 }
 
-exports.typeResolver = obj => {
+const typeResolver = obj => {
   const parts = obj.url.split('/')
   return swapiTypeToGraphQLType(parts[parts.length - 3])
+}
+
+module.exports = {
+  swapiTypeToGraphQLType,
+  toGlobalId,
+  fromGlobalId,
+  idFetcher,
+  typeResolver
 }

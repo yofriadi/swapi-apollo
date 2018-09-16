@@ -28,8 +28,24 @@ const objectWithId = obj => {
 
 const arrayList = str => str.split(', ')
 
+const commonFields = () => ({
+  id: `
+    "The ID of an object."
+    id: ID!
+  `,
+  created: `
+    "The ISO 8601 date format of the time that this resource was created."
+    created: String
+  `,
+  edited: `
+    "The ISO 8601 date format of the time that this resource was edited."
+    edited: String
+  `
+})
+
 module.exports = {
   getObjectFromTypeAndId,
   getObjectFromUrl,
-  arrayList
+  arrayList,
+  commonFields
 }

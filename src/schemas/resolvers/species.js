@@ -1,4 +1,4 @@
-const {getObjectFromTypeAndId, arrayList} = require('../../helpers')
+const {getObjectFromTypeAndId, arrayList, getObjectFromUrl} = require('../../helpers')
 const {toGlobalId, fromGlobalId} = require('../../relay')
 
 module.exports = {
@@ -30,6 +30,7 @@ module.exports = {
     averageLifespan: ({average_lifespan}) => average_lifespan,
     eyeColors: ({eye_colors}) => arrayList(eye_colors),
     hairColors: ({hair_colors}) => arrayList(hair_colors),
-    skinColors: ({skin_colors}) => arrayList(skin_colors)
+    skinColors: ({skin_colors}) => arrayList(skin_colors),
+    homeworld: ({homeworld}) => getObjectFromUrl(homeworld)
   }
 }
