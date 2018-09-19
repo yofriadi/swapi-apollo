@@ -3,7 +3,7 @@ const {makeExecutableSchema, gql} = require('apollo-server')
 const {fileLoader} = require('merge-graphql-schemas')
 const {merge} = require('lodash')
 
-const {nodeType} = require('./types')
+const {nodeType, sharedSchema} = require('./types')
 const nodeResolver = require('./resolvers')
 
 const types = fileLoader(join(__dirname, './types'))
@@ -16,6 +16,6 @@ const type = `
 const resolver = {}
 
 module.exports = makeExecutableSchema({
-  typeDefs: [type, ...types, nodeType],
+  typeDefs: [type, ...types, nodeType, sharedSchema],
   resolvers: merge(resolver, ...resolvers, nodeResolver)
 })

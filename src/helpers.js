@@ -26,7 +26,7 @@ const objectWithId = obj => {
   return data
 } */
 
-const arrayList = str => str.split(', ')
+const arrayList = str => str ? str.split(', ').map(s => s.trim()) : str
 
 const commonFields = () => ({
   id: `
@@ -43,9 +43,27 @@ const commonFields = () => ({
   `
 })
 
+const getObjectsByType = async type => {
+  let objects = []
+  let nextUrl = `https://swapi.co/api/${type}/`
+  while(nextUrl) {
+    const pageData = await localUrlLoader.load(nextUrl)
+    objects = objects.concat(pageData.results.map(objectWithId))
+    nextUrl = pageData.next
+  }
+  objects = sortObjectsById(objects)
+  return {
+    objects,
+    totalCount: objects.length
+  }
+}
+
+const sortObjectsById = array => array.sort((a, b) => a.id - b.id)
+
 module.exports = {
   getObjectFromTypeAndId,
   getObjectFromUrl,
+  getObjectsByType,
   arrayList,
   commonFields
 }

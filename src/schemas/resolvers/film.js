@@ -1,5 +1,13 @@
-const {getObjectFromTypeAndId, arrayList} = require('../../helpers')
-const {toGlobalId, fromGlobalId} = require('../../relay')
+const {
+  getObjectFromTypeAndId,
+  getObjectsByType,
+  arrayList
+} = require('../../helpers')
+const {
+  toGlobalId,
+  fromGlobalId,
+  connectionFromArray
+} = require('../../relay')
 
 module.exports = {
   Query: {
@@ -22,6 +30,13 @@ module.exports = {
       }
 
       throw new Error('must provide id or filmID')
+    },
+    allFilms: async (_, args) => {
+      const {objects, totalCount} = await getObjectsByType('films')
+      return {
+        totalCount,
+        ...connectionFromArray(objects, args)
+      }
     }
   },
   Film: {
@@ -30,5 +45,8 @@ module.exports = {
     openingCrawl: ({opening_crawl}) => opening_crawl,
     producers: ({producer}) => arrayList(producer),
     releaseDate: ({release_date}) => release_date
+  },
+  FilmsConnection: {
+    films: conn => conn.edges.map(edge => edge.node)
   }
 }

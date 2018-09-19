@@ -1,5 +1,13 @@
-const {getObjectFromTypeAndId, arrayList} = require('../../helpers')
-const {toGlobalId, fromGlobalId} = require('../../relay')
+const {
+  getObjectFromTypeAndId,
+  arrayList,
+  getObjectsByType
+} = require('../../helpers')
+const {
+  toGlobalId,
+  fromGlobalId,
+  connectionFromArray
+} = require('../../relay')
 
 module.exports = {
   Query: {
@@ -22,6 +30,13 @@ module.exports = {
       }
 
       throw new Error('must provide id or planetID')
+    },
+    allPlanets: async (_, args) => {
+      const {objects, totalCount} = await getObjectsByType('planets')
+      return {
+        totalCount,
+        ...connectionFromArray(objects, args)
+      }
     }
   },
   Planet: {
@@ -31,5 +46,8 @@ module.exports = {
     climates: ({climate}) => arrayList(climate),
     terrains: ({terrain}) => arrayList(terrain),
     surfaceWater: ({surface_water}) => surface_water
+  },
+  PlanetsConnection: {
+    planets: conn => conn.edges.map(edge => edge.node)
   }
 }

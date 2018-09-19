@@ -22,6 +22,24 @@ const nodeType = gql`
   }
 `
 
+const sharedSchema = gql`
+  "Information about pagination in a connection."
+  type PageInfo {
+    
+    "When pagination forwards, are there more items ?"
+    hasNextPage: Boolean!
+
+    "When pagination backwards, are there more items ?"
+    hasPreviousPage: Boolean!
+
+    "When paginating backwards, the cursor to continue."
+    startCursor: String
+
+    "When paginating forwards, the cursor to continue."
+    endCursor: String
+  }
+`
+
 module.exports = {
   FilmType,
   PersonType,
@@ -29,5 +47,6 @@ module.exports = {
   SpeciesType,
   StarshipType,
   VehicleType,
-  nodeType
+  nodeType,
+  sharedSchema
 }

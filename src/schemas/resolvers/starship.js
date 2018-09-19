@@ -1,5 +1,13 @@
-const {getObjectFromTypeAndId, arrayList} = require('../../helpers')
-const {toGlobalId, fromGlobalId} = require('../../relay')
+const {
+  getObjectFromTypeAndId,
+  arrayList,
+  getObjectsByType
+} = require('../../helpers')
+const {
+  toGlobalId,
+  fromGlobalId,
+  connectionFromArray
+} = require('../../relay')
 
 module.exports = {
   Query: {
@@ -22,7 +30,14 @@ module.exports = {
       }
 
       throw new Error('must provide id or starshipID')
-    }
+    },
+    allStarships: async (_, args) => {
+      const {objects, totalCount} = await getObjectsByType('starships')
+      return {
+        totalCount,
+        ...connectionFromArray(objects, args)
+      }
+    }   
   },
   Starship: {
     id: ({id}) => toGlobalId('starships', id),
@@ -32,5 +47,8 @@ module.exports = {
     maxAtmospheringSpeed: ({max_atmosphering_speed}) => max_atmosphering_speed,
     hyperdriveRating: ({hyperdrive_rating}) => hyperdrive_rating,
     cargoCapacity: ({cargo_capacity}) => cargo_capacity
+  },
+  StarshipsConnection: {
+    starships: conn => conn.edges.map(edge => edge.node)
   }
 }

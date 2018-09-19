@@ -1,5 +1,13 @@
-const {getObjectFromTypeAndId, getObjectFromUrl} = require('../../helpers')
-const {fromGlobalId, toGlobalId} = require('../../relay')
+const {
+  getObjectFromTypeAndId,
+  getObjectFromUrl,
+  getObjectsByType
+} = require('../../helpers')
+const {
+  fromGlobalId,
+  toGlobalId,
+  connectionFromArray
+} = require('../../relay')
 
 module.exports = {
   Query: {
@@ -23,6 +31,13 @@ module.exports = {
       }
 
       throw new Error('must provide id or personID')
+    },
+    allPeople: async (_, args) => {
+      const {objects, totalCount} = await getObjectsByType('people')
+      return {
+        totalCount,
+        ...connectionFromArray(objects, args)
+      }
     }
   },
   Person: {
@@ -32,5 +47,8 @@ module.exports = {
     hairColor: ({hair_color}) => hair_color,
     skinColor: ({skin_color}) => skin_color,
     homeworld: ({homeworld}) => getObjectFromUrl(homeworld)
+  },
+  PeopleConnection: {
+    people: conn => conn.edges.map(edge => edge.node)
   }
 }

@@ -31,10 +31,10 @@ module.exports = gql`
     manufacturers: [String]
 
     "The cost of this starship new, in galactic credits."
-    costInCredits: Float
+    costInCredits: String  # Float
 
     "The length of this starship in meters."
-    length: Float
+    length: String  # Float before
 
     "The number of personnel needed to run or pilot this starship."
     crew: String
@@ -43,25 +43,60 @@ module.exports = gql`
     passengers: String
 
     "The maximum speed of this starship in atmosphere. null if this starship is incapable of atmosphering flight."
-    maxAtmospheringSpeed: Int
+    maxAtmospheringSpeed: String  # Int before
 
     "The class of this starships hyperdrive."
-    hyperdriveRating: Float
+    hyperdriveRating: String  # Float before
 
     "The Maximum number of Megalights this starship can travel in a standard hour. A 'Megalight' is a standard unit of distance and has never been defined before within the Star Wars universe. This figure is only really useful for measuring the difference in speed of starships. We can assume it is similar to AU, the distance between our Sun (Sol) and Earth."
-    MGLT: Int
+    MGLT: String  # Int before
 
     "The maximum number of kilograms that this starship can transport."
-    cargoCapacity: Float
+    cargoCapacity: String  # Float before
 
     "The maximum length of time that this starship can provide consumables for it's entire crew without having to resupply."
     consumables: String
   }
 
+  "An edge in a connection."
+  type StarshipsEdge {
+ 
+    "A cursor for use in pagination."
+    cursor: String!
+
+    "The item at the end of the edge."
+    node: Starship
+  }
+
+  "A connection to a list of items."
+  type StarshipsConnection {
+
+    "A count of the total number of objects in this connection, ignoring pagination. This allows a client to fetch the first five objects by passing '5' as the argument to 'first', then fetch the total count so it could display '5 of 83', for example."
+    totalCount: Int
+
+    "Information to aid in pagination."
+    pageInfo: PageInfo!
+
+    "A list of edges."
+    edges: [StarshipsEdge]
+
+    "A list of all of the objects returned in the connection. This is a convenience field provided for quickly exploring the API; rather than querying for '{ edges { node } }' when no edge data is needed, this field can be be used instead. Note that when clients like Relay need to fetch the 'cursor' field on the edge to enable efficient pagination, this shortcut cannot be used, and the full '{ edges { node } }' version should be used instead."
+    starships: [Starship]
+  }
+
   extend type Query {
+    "Get one starship."
     starship(
       id: ID
       starshipID: ID
     ): Starship
+
+    "Get all starships."
+    allStarships(
+      after: String
+      first: Int
+      before: String
+      last: Int
+    ): StarshipsConnection
   }
 `

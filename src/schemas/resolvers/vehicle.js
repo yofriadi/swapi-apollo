@@ -1,5 +1,13 @@
-const {getObjectFromTypeAndId, arrayList} = require('../../helpers')
-const {toGlobalId, fromGlobalId} = require('../../relay')
+const {
+  getObjectFromTypeAndId,
+  arrayList,
+  getObjectsByType
+} = require('../../helpers')
+const {
+  toGlobalId,
+  fromGlobalId,
+  connectionFromArray
+} = require('../../relay')
 
 module.exports = {
   Query: {
@@ -22,6 +30,13 @@ module.exports = {
       }
 
       throw new Error('must provide id or vehicleID')
+    },
+    allVehicles: async (_, args) => {
+      const {objects, totalCount} = await getObjectsByType('vehicles')
+      return {
+        totalCount,
+        ...connectionFromArray(objects, args)
+      }
     }
   },
   Vehicle: {
@@ -31,5 +46,8 @@ module.exports = {
     costInCredits: ({cost_in_credits}) => cost_in_credits,
     maxAtmospheringSpeed: ({max_atmosphering_speed}) => max_atmosphering_speed,
     cargoCapacity: ({cargo_capacity}) => cargo_capacity
+  },
+  VehiclesConnection: {
+    vehicles: conn => conn.edges.map(edge => edge.node)
   }
 }

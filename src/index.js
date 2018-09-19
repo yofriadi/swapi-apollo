@@ -4,6 +4,7 @@ const schema = require('./schemas')
 
 const playground = {
   settings: {
+    'editor.theme': 'light',
     'editor.cursorShape': 'block',
     'editor.fontSize': 16,
     'editor.fontFamily': "'Operator Mono Book'"

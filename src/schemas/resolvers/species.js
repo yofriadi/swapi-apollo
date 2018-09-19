@@ -1,5 +1,14 @@
-const {getObjectFromTypeAndId, arrayList, getObjectFromUrl} = require('../../helpers')
-const {toGlobalId, fromGlobalId} = require('../../relay')
+const {
+  getObjectFromTypeAndId,
+  arrayList,
+  getObjectFromUrl,
+  getObjectsByType
+} = require('../../helpers')
+const {
+  toGlobalId,
+  fromGlobalId,
+  connectionFromArray
+} = require('../../relay')
 
 module.exports = {
   Query: {
@@ -22,6 +31,13 @@ module.exports = {
       }
 
       throw new Error('must provide id or speciesID')
+    },
+    allSpecies: async (_, args) => {
+      const {objects, totalCount} = await getObjectsByType('species')
+      return {
+        totalCount,
+        ...connectionFromArray(objects, args)
+      }
     }
   },
   Species: {
@@ -31,6 +47,9 @@ module.exports = {
     eyeColors: ({eye_colors}) => arrayList(eye_colors),
     hairColors: ({hair_colors}) => arrayList(hair_colors),
     skinColors: ({skin_colors}) => arrayList(skin_colors),
-    homeworld: ({homeworld}) => getObjectFromUrl(homeworld)
+    homeworld: ({homeworld}) => homeworld ? getObjectFromUrl(homeworld) : 'unknown'
+  },
+  SpeciesConnection: {
+    species: conn => conn.edges.map(edge => edge.node)
   }
 }
