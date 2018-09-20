@@ -3,20 +3,18 @@ const {gql} = require('apollo-server')
 const {commonFields} = require('../../helpers')
 
 const {
-  id,
-  created,
-  edited
+  idType,
+  createdType,
+  editedType
 } = commonFields()
 
 module.exports = gql`
   "A single transport craft that has hyperdrive capability."
   type Starship {
 
-    ${id}
-
-    ${created}
-
-    ${edited}
+    ${idType}
+    ${createdType}
+    ${editedType}
 
     "The name of this starship. The common name, such as 'Death Star'."
     name: String

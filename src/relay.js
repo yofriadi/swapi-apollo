@@ -142,10 +142,89 @@ const getOffsetWithDefault = (cursor, defaultOffset) => {
 }
 
 const cursorToOffset = cursor => parseInt(unbase64(cursor).substring(PREFIX.length), 10)
-
 const offsetToCursor = offset => base64(PREFIX + offset)
-
 const PREFIX = 'arrayconnection'
+
+const rootConnectionDefinitions = (name, prop) => {
+  const type = name.substring(0, name.length - 1)
+  return connectionObjectType(
+    name,
+    prop,
+    type
+  )
+}
+const connectionDefinitions = (name, prop) => {
+  const type = prop[0].toUpperCase() + prop.substring(1)
+  return connectionObjectType(
+    name,
+    prop,
+    type
+  )
+}
+const connectionObjectType = (name, prop, type) => {
+  const connectionField = `
+    ${prop}Connection(
+      ${connectionArgs}
+    ): ${name}Connection
+  `
+  const edgeType = `    
+    "An edge in a connection."
+    type ${name}Edge {
+
+      "A cursor for use in pagination."
+      cursor: String!
+
+      "The item at the end of the edge."
+      node: ${type}
+    }
+  `
+  const connectionType = `
+    "A connection to a list of items."
+    type ${name}Connection {
+
+      "A count of the total number of objects in this connection, ignoring pagination. This allows a client to fetch the first five objects by passing '5' as the argument to 'first', then fetch the total count so it could display '5 of 83', for example."
+      totalCount: Int
+ 
+      "Information to aid in pagination."
+      pageInfo: PageInfo!
+
+      "A list of edges."
+      edges: [${name}Edge]
+
+      "A list of all of the objects returned in the connection. This is a convenience field provided for quickly exploring the API; rather than querying for '{ edges { node } }' when no edge data is needed, this field can be be used instead. Note that when clients like Relay need to fetch the 'cursor' field on the edge to enable efficient pagination, this shortcut cannot be used, and the full '{ edges { node } }' version should be used instead."
+      ${prop}: [${type}]
+    }
+  `
+  return {
+    connectionField,
+    edgeType,
+    connectionType,
+  }
+}
+const queryDefinitions = (name, prop, ...args) => {
+  const type = name.substring(0, name.length - 1)
+  const queryOnce = `
+    ${prop}(
+      id: ID
+      ${args}
+    ): ${type}
+  `
+  const queryAll = `
+    all${name}(
+      ${connectionArgs}
+    ): ${name}Connection
+  `
+  return {
+    queryOnce,
+    queryAll
+  }
+}
+const connectionArgs = `
+  after: String
+  first: Int
+  before: String
+  last: Int
+`
 
 module.exports = {
   swapiTypeToGraphQLType,
@@ -153,5 +232,8 @@ module.exports = {
   fromGlobalId,
   idFetcher,
   typeResolver,
-  connectionFromArray
+  connectionFromArray,
+  connectionDefinitions,
+  rootConnectionDefinitions,
+  queryDefinitions
 }

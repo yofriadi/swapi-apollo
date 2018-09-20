@@ -29,15 +29,15 @@ const objectWithId = obj => {
 const arrayList = str => str ? str.split(', ').map(s => s.trim()) : str
 
 const commonFields = () => ({
-  id: `
+  idType: `
     "The ID of an object."
     id: ID!
   `,
-  created: `
+  createdType: `
     "The ISO 8601 date format of the time that this resource was created."
     created: String
   `,
-  edited: `
+  editedType: `
     "The ISO 8601 date format of the time that this resource was edited."
     edited: String
   `
