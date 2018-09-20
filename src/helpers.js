@@ -58,11 +58,17 @@ const getObjectsByType = async type => {
   }
 }
 
+const getObjectsFromUrls = async urls => {
+  const array = await Promise.all(urls.map(getObjectFromUrl))
+  return sortObjectsById(array)
+}
+
 const sortObjectsById = array => array.sort((a, b) => a.id - b.id)
 
 module.exports = {
   getObjectFromTypeAndId,
   getObjectFromUrl,
+  getObjectsFromUrls,
   getObjectsByType,
   arrayList,
   commonFields

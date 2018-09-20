@@ -1,5 +1,6 @@
 const {
   getObjectFromTypeAndId,
+  getObjectsFromUrls,
   getObjectsByType,
   arrayList
 } = require('../../helpers')
@@ -44,9 +45,19 @@ module.exports = {
     episodeID: ({episode_id}) => episode_id,
     openingCrawl: ({opening_crawl}) => opening_crawl,
     producers: ({producer}) => arrayList(producer),
-    releaseDate: ({release_date}) => release_date
+    releaseDate: ({release_date}) => release_date,
+    speciesConnection: async (obj, args) => {
+      const array = await getObjectsFromUrls(obj['species'])
+      return {
+        totalCount: array.length,
+        ...connectionFromArray(array, args)
+      }
+    }
   },
   FilmsConnection: {
     films: conn => conn.edges.map(edge => edge.node)
+  },
+  FilmSpeciesConnection: {
+    species: conn => conn.edges.map(edge => edge.node)
   }
 }
