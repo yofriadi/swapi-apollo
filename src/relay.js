@@ -1,4 +1,7 @@
-const {getObjectFromTypeAndId} = require('./helpers')
+const {
+  getObjectFromTypeAndId,
+  getObjectsFromUrls
+} = require('./helpers')
 
 const {
   FilmType,
@@ -145,46 +148,48 @@ const cursorToOffset = cursor => parseInt(unbase64(cursor).substring(PREFIX.leng
 const offsetToCursor = offset => base64(PREFIX + offset)
 const PREFIX = 'arrayconnection'
 
-const connectionDefinitions = (name, prop, type, singularProp) => {
-  const connectionField = `
-    ${singularProp ? singularProp : prop}Connection(
-      ${connectionArgs}
-    ): ${name}Connection
-  `
-  const edgeType = `    
-    "An edge in a connection."
-    type ${name}Edge {
+const connectionField = dimensArray =>
+  dimensArray.map(arr => {
+    const [name, prop] = arr
+    return `
+      ${prop}Connection(
+        ${connectionArgs}
+      ): ${name}Connection
+    `
+  })
 
-      "A cursor for use in pagination."
-      cursor: String!
+const connectionDefinitions = dimensArray =>
+  dimensArray.map(arr => {
+    const [name, prop, type] = arr
+    return `
+      "An edge in a connection."
+      type ${name}Edge {
 
-      "The item at the end of the edge."
-      node: ${type}
-    }
-  `
-  const connectionType = `
-    "A connection to a list of items."
-    type ${name}Connection {
+        "A cursor for use in pagination."
+        cursor: String!
 
-      "A count of the total number of objects in this connection, ignoring pagination. This allows a client to fetch the first five objects by passing '5' as the argument to 'first', then fetch the total count so it could display '5 of 83', for example."
-      totalCount: Int
- 
-      "Information to aid in pagination."
-      pageInfo: PageInfo!
+        "The item at the end of the edge."
+        node: ${type}
+      }
 
-      "A list of edges."
-      edges: [${name}Edge]
+      "A connection to a list of items."
+      type ${name}Connection {
 
-      "A list of all of the objects returned in the connection. This is a convenience field provided for quickly exploring the API; rather than querying for '{ edges { node } }' when no edge data is needed, this field can be be used instead. Note that when clients like Relay need to fetch the 'cursor' field on the edge to enable efficient pagination, this shortcut cannot be used, and the full '{ edges { node } }' version should be used instead."
-      ${prop}: [${type}]
-    }
-  `
-  return {
-    connectionField,
-    edgeType,
-    connectionType,
-  }
-}
+        "A count of the total number of objects in this connection, ignoring pagination. This allows a client to fetch the first five objects by passing '5' as the argument to 'first', then fetch the total count so it could display '5 of 83', for example."
+        totalCount: Int
+   
+        "Information to aid in pagination."
+        pageInfo: PageInfo!
+
+        "A list of edges."
+        edges: [${name}Edge]
+
+        "A list of all of the objects returned in the connection. This is a convenience field provided for quickly exploring the API; rather than querying for '{ edges { node } }' when no edge data is needed, this field can be be used instead. Note that when clients like Relay need to fetch the 'cursor' field on the edge to enable efficient pagination, this shortcut cannot be used, and the full '{ edges { node } }' version should be used instead."
+        ${prop}: [${type}]
+      } 
+    `
+  })
+
 const queryDefinitions = (name, prop, ...args) => {
   const type = name.substring(0, name.length - 1)
   const queryOnce = `
@@ -209,6 +214,13 @@ const connectionArgs = `
   before: String
   last: Int
 `
+const connectionResolver = async (name, obj, args) => {
+  const array = await getObjectsFromUrls(obj[name])
+  return {
+    totalCount: array.length,
+    ...connectionFromArray(array, args)
+  }
+}
 
 module.exports = {
   swapiTypeToGraphQLType,
@@ -217,6 +229,8 @@ module.exports = {
   idFetcher,
   typeResolver,
   connectionFromArray,
+  connectionField,
   connectionDefinitions,
-  queryDefinitions
+  queryDefinitions,
+  connectionResolver
 }

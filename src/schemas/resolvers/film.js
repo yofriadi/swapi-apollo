@@ -1,13 +1,12 @@
 const {
   getObjectFromTypeAndId,
-  getObjectsFromUrls,
   getObjectsByType,
   arrayList
 } = require('../../helpers')
 const {
   toGlobalId,
   fromGlobalId,
-  connectionFromArray
+  connectionResolver
 } = require('../../relay')
 
 module.exports = {
@@ -46,41 +45,11 @@ module.exports = {
     openingCrawl: ({opening_crawl}) => opening_crawl,
     producers: ({producer}) => arrayList(producer),
     releaseDate: ({release_date}) => release_date,
-    speciesConnection: async (obj, args) => {
-      const array = await getObjectsFromUrls(obj['species'])
-      return {
-        totalCount: array.length,
-        ...connectionFromArray(array, args)
-      }
-    },
-    starshipConnection: async (obj, args) => {
-      const array = await getObjectsFromUrls(obj['starships'])
-      return {
-        totalCount: array.length,
-        ...connectionFromArray(array, args)
-      }
-    },
-    vehicleConnection: async (obj, args) => {
-      const array = await getObjectsFromUrls(obj['vehicles'])
-      return {
-        totalCount: array.length,
-        ...connectionFromArray(array, args)
-      }
-    },
-    characterConnection: async (obj, args) => {
-      const array = await getObjectsFromUrls(obj['characters'])
-      return {
-        totalCount: array.length,
-        ...connectionFromArray(array, args)
-      }
-    },
-    planetConnection: async (obj, args) => {
-      const array = await getObjectsFromUrls(obj['planets'])
-      return {
-        totalCount: array.length,
-        ...connectionFromArray(array, args)
-      }
-    }
+    speciesConnection: (obj, args) => connectionResolver('species', obj, args),
+    starshipConnection: (obj, args) => connectionResolver('starships', obj, args),
+    vehicleConnection: (obj, args) => connectionResolver('vehicles', obj, args),
+    characterConnection: (obj, args) => connectionResolver('characters', obj, args),
+    planetConnection: (obj, args) => connectionResolver('planets', obj, args)
   },
   FilmsConnection: {
     films: conn => conn.edges.map(edge => edge.node)

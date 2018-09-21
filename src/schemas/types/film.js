@@ -1,8 +1,6 @@
-const {gql} = require('apollo-server')
-
 const {commonFields} = require('../../helpers')
 const {
-  connectionArgs,
+  connectionField,
   connectionDefinitions,
   queryDefinitions
 } = require('../../relay')
@@ -12,63 +10,36 @@ const {
   createdType,
   editedType
 } = commonFields()
-const {
-  edgeType: edgeFilmsType,
-  connectionType: connectionFilmsType
-} = connectionDefinitions(
-  'Films',
-  'films',
-  'Film'
-)
-const {
-  connectionField: connectionFieldSpecies,
-  edgeType: edgeSpeciesType,
-  connectionType: connectionSpeciesType
-} = connectionDefinitions(
-  'FilmSpecies',
-  'species',
-  'Species'
-)
-const {
-  connectionField: connectionFieldStarship,
-  edgeType: edgeStarshipsType,
-  connectionType: connectionStarshipsType
-} = connectionDefinitions(
-  'FilmStarships',
-  'starships',
-  'Starship',
-  'starship'
-)
-const {
-  connectionField: connectionFieldVehicle,
-  edgeType: edgeVehiclesType,
-  connectionType: connectionVehiclesType
-} = connectionDefinitions(
-  'FilmVehicles',
-  'vehicles',
-  'Vehicle',
-  'vehicle'
-)
-const {
-  connectionField: connectionFieldCharacter,
-  edgeType: edgeCharactersType,
-  connectionType: connectionCharactersType
-} = connectionDefinitions(
-  'FilmCharacters',
-  'characters',
-  'Person',  // type def
-  'character'
-)
-const {
-  connectionField: connectionFieldPlanet,
-  edgeType: edgePlanetsType,
-  connectionType: connectionPlanetsType
-} = connectionDefinitions(
-  'FilmPlanets',
-  'planets',
-  'Planet',  // type def
-  'planet'
-)
+
+const [
+  speciesConn,
+  starshipConn,
+  vehicleConn,
+  characterConn,
+  planetConn
+] = connectionField([
+  ['FilmSpecies', 'species'],
+  ['FilmStarships', 'starship'],
+  ['FilmVehicles', 'vehicle'],
+  ['FilmCharacters', 'character'],
+  ['FilmPlanets', 'planet']
+])
+
+const [
+  filmsConn,
+  filmSpeciesConn,
+  filmStarshipsConn,
+  filmVehiclesConn,
+  filmCharactersConn,
+  filmPlanetsConn
+] = connectionDefinitions([
+  ['Films', 'films', 'Film'],
+  ['FilmSpecies', 'species', 'Species'],
+  ['FilmStarships', 'starships', 'Starship'],
+  ['FilmVehicles', 'vehicles', 'Vehicle'],
+  ['FilmCharacters', 'characters', 'Person'],
+  ['FilmPlanets', 'planets', 'Planet']
+])
 const {
   queryOnce,
   queryAll
@@ -78,7 +49,7 @@ const {
   'filmID: ID'
 )
 
-module.exports = gql`
+module.exports = `
   "A single film."
   type Film {
 
@@ -105,36 +76,27 @@ module.exports = gql`
     releaseDate: String
 
     "Connection of Film and Species."
-    ${connectionFieldSpecies}
+    ${speciesConn}
 
     "Connection of Film and Starships."
-    ${connectionFieldStarship}
+    ${starshipConn}
 
-    "Connection of Film and Vehicles"
-    ${connectionFieldVehicle}
+    "Connection of Film and Vehicles."
+    ${vehicleConn}
 
-    "Connection of Film and Characters"
-    ${connectionFieldCharacter}
+    "Connection of Film and Characters."
+    ${characterConn}
 
-    "Connection of Film and Planets"
-    ${connectionFieldPlanet}
+    "Connection of Film and Planets."
+    ${planetConn}
   }
 
-  # Root connection type
-  ${edgeFilmsType}
-  ${connectionFilmsType}
-
-  # Connection type
-  ${edgeSpeciesType}
-  ${connectionSpeciesType}
-  ${edgeStarshipsType}
-  ${connectionStarshipsType}
-  ${edgeVehiclesType}
-  ${connectionVehiclesType}
-  ${edgeCharactersType}
-  ${connectionCharactersType}
-  ${edgePlanetsType}
-  ${connectionPlanetsType}
+  ${filmsConn}
+  ${filmSpeciesConn}
+  ${filmStarshipsConn}
+  ${filmVehiclesConn}
+  ${filmCharactersConn}
+  ${filmPlanetsConn}
 
   type Query {
     "Get one Film."
