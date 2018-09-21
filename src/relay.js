@@ -145,25 +145,9 @@ const cursorToOffset = cursor => parseInt(unbase64(cursor).substring(PREFIX.leng
 const offsetToCursor = offset => base64(PREFIX + offset)
 const PREFIX = 'arrayconnection'
 
-const rootConnectionDefinitions = (name, prop) => {
-  const type = name.substring(0, name.length - 1)
-  return connectionObjectType(
-    name,
-    prop,
-    type
-  )
-}
-const connectionDefinitions = (name, prop) => {
-  const type = prop[0].toUpperCase() + prop.substring(1)
-  return connectionObjectType(
-    name,
-    prop,
-    type
-  )
-}
-const connectionObjectType = (name, prop, type) => {
+const connectionDefinitions = (name, prop, type, singularProp) => {
   const connectionField = `
-    ${prop}Connection(
+    ${singularProp ? singularProp : prop}Connection(
       ${connectionArgs}
     ): ${name}Connection
   `
@@ -234,6 +218,5 @@ module.exports = {
   typeResolver,
   connectionFromArray,
   connectionDefinitions,
-  rootConnectionDefinitions,
   queryDefinitions
 }
