@@ -28,20 +28,16 @@ const objectWithId = obj => {
 
 const arrayList = str => str ? str.split(', ').map(s => s.trim()) : str
 
-const commonFields = () => ({
-  idType: `
-    "The ID of an object."
-    id: ID!
-  `,
-  createdType: `
-    "The ISO 8601 date format of the time that this resource was created."
-    created: String
-  `,
-  editedType: `
-    "The ISO 8601 date format of the time that this resource was edited."
-    edited: String
-  `
-})
+const commonFields = () => `
+  "The ID of an object."
+  id: ID!
+
+  "The ISO 8601 date format of the time that this resource was created."
+  created: String
+
+  "The ISO 8601 date format of the time that this resource was edited."
+  edited: String
+`
 
 const getObjectsByType = async type => {
   let objects = []

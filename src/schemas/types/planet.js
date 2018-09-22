@@ -1,20 +1,38 @@
-const {gql} = require('apollo-server')
-
 const {commonFields} = require('../../helpers')
+const {
+  connectionField,
+  connectionDefinitions,
+  queryDefinitions
+} = require('../../relay')
+
+const commonFieldsType = commonFields()
+
+const conn = connectionField([
+  ['PlanetResidents', 'resident'],
+  ['PlanetFilms', 'film']
+])
+
+const connDefs = connectionDefinitions([
+  ['Planets', 'planets', 'Planet'],
+  ['PlanetResidents', 'residents', 'Person'],
+  ['PlanetFilms', 'films', 'Film']
+])
 
 const {
-  idType,
-  createdType,
-  editedType
-} = commonFields()
+  queryOnce,
+  queryAll
+} = queryDefinitions(
+  'Planets',
+  'planet',
+  'Planet',
+  'planetID: ID'
+)
 
-module.exports = gql`
+module.exports = `
   "A large mass, planet or planetoid in the Star Wars Universe, at the time of 0 ABY."
   type Planet {
 
-    ${idType}
-    ${createdType}
-    ${editedType}
+    ${commonFieldsType}
 
     "The name of this planet."
     name: String
@@ -42,47 +60,17 @@ module.exports = gql`
 
     "The percentage of the planet surface that is naturally occuring water or bodies of water."
     surfaceWater: String  # Float before
+
+    ${conn}
   }
 
-  "An edge in a connection."
-  type PlanetsEdge {
- 
-    "A cursor for use in pagination."
-    cursor: String!
-
-    "The item at the end of the edge."
-    node: Planet
-  }
-
-  "A connection to a list of items."
-  type PlanetsConnection {
-
-    "A count of the total number of objects in this connection, ignoring pagination. This allows a client to fetch the first five objects by passing '5' as the argument to 'first', then fetch the total count so it could display '5 of 83', for example."
-    totalCount: Int
-
-    "Information to aid in pagination."
-    pageInfo: PageInfo!
-
-    "A list of edges."
-    edges: [PlanetsEdge]
-
-    "A list of all of the objects returned in the connection. This is a convenience field provided for quickly exploring the API; rather than querying for '{ edges { node } }' when no edge data is needed, this field can be be used instead. Note that when clients like Relay need to fetch the 'cursor' field on the edge to enable efficient pagination, this shortcut cannot be used, and the full '{ edges { node } }' version should be used instead."
-    planets: [Planet]
-  }
+  ${connDefs}
 
   extend type Query {
-    "Get on planet."
-    planet(
-      id: ID
-      planetID: ID
-    ): Planet
+    "Get one planet."
+    ${queryOnce}
 
     "Get all planets."
-    allPlanets(
-      after: String
-      first: Int
-      before: String
-      last: Int
-    ): PlanetsConnection
+    ${queryAll}
   }
 `

@@ -1,20 +1,38 @@
-const {gql} = require('apollo-server')
-
 const {commonFields} = require('../../helpers')
+const {
+  connectionField,
+  connectionDefinitions,
+  queryDefinitions
+} = require('../../relay')
+
+const commonFieldsType = commonFields()
+
+const conn = connectionField([
+  ['SpeciesPeople', 'person'],
+  ['SpeciesFilms', 'film']
+])
+
+const connDefs = connectionDefinitions([
+  ['Species', 'species', 'Species'],
+  ['SpeciesPeople', 'people', 'Person'],
+  ['SpeciesFilms', 'films', 'Film']
+])
 
 const {
-  idType,
-  createdType,
-  editedType
-} = commonFields()
+  queryOnce,
+  queryAll
+} = queryDefinitions(
+  'Species',
+  'species',
+  'Species',
+  'speciesID: ID'
+)
 
-module.exports = gql`
+module.exports = `
   "A type of person or character within the Star Wars Universe."
   type Species {
 
-    ${idType}
-    ${createdType}
-    ${editedType}
+    ${commonFieldsType}
 
     "The name of this species."
     name: String
@@ -45,47 +63,17 @@ module.exports = gql`
 
     "A planet that this species originates from."
     homeworld: Planet
+
+    ${conn}
   }
 
-  "An edge in a connection."
-  type SpeciesEdge {
- 
-    "A cursor for use in pagination."
-    cursor: String!
-
-    "The item at the end of the edge."
-    node: Species
-  }
-
-  "A connection to a list of items."
-  type SpeciesConnection {
-
-    "A count of the total number of objects in this connection, ignoring pagination. This allows a client to fetch the first five objects by passing '5' as the argument to 'first', then fetch the total count so it could display '5 of 83', for example."
-    totalCount: Int
-
-    "Information to aid in pagination."
-    pageInfo: PageInfo!
-
-    "A list of edges."
-    edges: [SpeciesEdge]
-
-    "A list of all of the objects returned in the connection. This is a convenience field provided for quickly exploring the API; rather than querying for '{ edges { node } }' when no edge data is needed, this field can be be used instead. Note that when clients like Relay need to fetch the 'cursor' field on the edge to enable efficient pagination, this shortcut cannot be used, and the full '{ edges { node } }' version should be used instead."
-    species: [Species]
-  }
+  ${connDefs}
 
   extend type Query {
     "Get on species."
-    species(
-      id: ID
-      speciesID: ID
-    ): Species
+    ${queryOnce}
 
     "Get all species."
-    allSpecies(
-      after: String
-      first: Int
-      before: String
-      last: Int
-    ): SpeciesConnection
+    ${queryAll}
   }
 `

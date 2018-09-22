@@ -152,11 +152,12 @@ const connectionField = dimensArray =>
   dimensArray.map(arr => {
     const [name, prop] = arr
     return `
+      "A connection of current node."
       ${prop}Connection(
         ${connectionArgs}
       ): ${name}Connection
     `
-  })
+  }).reduce((acc, curr) => acc + curr, '')
 
 const connectionDefinitions = dimensArray =>
   dimensArray.map(arr => {
@@ -188,26 +189,21 @@ const connectionDefinitions = dimensArray =>
         ${prop}: [${type}]
       } 
     `
-  })
+  }).reduce((acc, curr) => acc + curr, '')
 
-const queryDefinitions = (name, prop, ...args) => {
-  const type = name.substring(0, name.length - 1)
-  const queryOnce = `
+const queryDefinitions = (name, prop, type, ...args) => ({
+  queryOnce: `
     ${prop}(
       id: ID
       ${args}
     ): ${type}
-  `
-  const queryAll = `
+  `,
+  queryAll: `
     all${name}(
       ${connectionArgs}
     ): ${name}Connection
   `
-  return {
-    queryOnce,
-    queryAll
-  }
-}
+})
 const connectionArgs = `
   after: String
   first: Int

@@ -6,7 +6,7 @@ const {
 const {
   toGlobalId,
   fromGlobalId,
-  connectionFromArray
+  connectionResolver
 } = require('../../relay')
 
 module.exports = {
@@ -45,9 +45,17 @@ module.exports = {
     orbitalPeriod: ({orbital_period}) => orbital_period,
     climates: ({climate}) => arrayList(climate),
     terrains: ({terrain}) => arrayList(terrain),
-    surfaceWater: ({surface_water}) => surface_water
+    surfaceWater: ({surface_water}) => surface_water,
+    residentConnection: (obj, args) => connectionResolver('residents', obj, args),
+    filmConnection: (obj, args) => connectionResolver('films', obj, args)
   },
   PlanetsConnection: {
     planets: conn => conn.edges.map(edge => edge.node)
+  },
+  PlanetResidentsConnection: {
+    residents: conn => conn.edges.map(edge => edge.node)
+  },
+  PlanetFilmsConnection: {
+    films: conn => conn.edges.map(edge => edge.node)
   }
 }

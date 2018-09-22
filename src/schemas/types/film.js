@@ -5,19 +5,9 @@ const {
   queryDefinitions
 } = require('../../relay')
 
-const {
-  idType,
-  createdType,
-  editedType
-} = commonFields()
+const commonFieldsType = commonFields()
 
-const [
-  speciesConn,
-  starshipConn,
-  vehicleConn,
-  characterConn,
-  planetConn
-] = connectionField([
+const conn = connectionField([
   ['FilmSpecies', 'species'],
   ['FilmStarships', 'starship'],
   ['FilmVehicles', 'vehicle'],
@@ -25,14 +15,7 @@ const [
   ['FilmPlanets', 'planet']
 ])
 
-const [
-  filmsConn,
-  filmSpeciesConn,
-  filmStarshipsConn,
-  filmVehiclesConn,
-  filmCharactersConn,
-  filmPlanetsConn
-] = connectionDefinitions([
+const connDefs = connectionDefinitions([
   ['Films', 'films', 'Film'],
   ['FilmSpecies', 'species', 'Species'],
   ['FilmStarships', 'starships', 'Starship'],
@@ -40,12 +23,14 @@ const [
   ['FilmCharacters', 'characters', 'Person'],
   ['FilmPlanets', 'planets', 'Planet']
 ])
+
 const {
   queryOnce,
   queryAll
 } = queryDefinitions(
   'Films',
   'film',
+  'Film',
   'filmID: ID'
 )
 
@@ -53,9 +38,7 @@ module.exports = `
   "A single film."
   type Film {
 
-    ${idType}
-    ${createdType}
-    ${editedType}
+    ${commonFieldsType}
 
     "The title of this film."
     title: String
@@ -75,28 +58,10 @@ module.exports = `
     "The ISO 8601 date format of film release at original creator country."
     releaseDate: String
 
-    "Connection of Film and Species."
-    ${speciesConn}
-
-    "Connection of Film and Starships."
-    ${starshipConn}
-
-    "Connection of Film and Vehicles."
-    ${vehicleConn}
-
-    "Connection of Film and Characters."
-    ${characterConn}
-
-    "Connection of Film and Planets."
-    ${planetConn}
+    ${conn}
   }
 
-  ${filmsConn}
-  ${filmSpeciesConn}
-  ${filmStarshipsConn}
-  ${filmVehiclesConn}
-  ${filmCharactersConn}
-  ${filmPlanetsConn}
+  ${connDefs}
 
   type Query {
     "Get one Film."

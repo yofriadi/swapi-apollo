@@ -4,9 +4,9 @@ const {
   getObjectsByType
 } = require('../../helpers')
 const {
-  fromGlobalId,
   toGlobalId,
-  connectionFromArray
+  fromGlobalId,
+  connectionResolver
 } = require('../../relay')
 
 module.exports = {
@@ -46,9 +46,22 @@ module.exports = {
     eyeColor: ({eye_color}) => eye_color,
     hairColor: ({hair_color}) => hair_color,
     skinColor: ({skin_color}) => skin_color,
-    homeworld: ({homeworld}) => getObjectFromUrl(homeworld)
+    homeworld: ({homeworld}) => getObjectFromUrl(homeworld),
+    species: ({species}) => getObjectFromUrl(species),
+    filmConnection: (obj, args) => connectionResolver('films', obj, args),
+    starshipConnection: (obj, args) => connectionResolver('starships', obj, args),
+    vehicleConnection: (obj, args) => connectionResolver('vehicles', obj, args)
   },
   PeopleConnection: {
     people: conn => conn.edges.map(edge => edge.node)
+  },
+  PersonFilmsConnection: {
+    films: conn => conn.edges.map(edge => edge.node)
+  },
+  PersonStarshipsConnection: {
+    starships: conn => conn.edges.map(edge => edge.node)
+  },
+  PersonVehiclesConnection: {
+    vehicles: conn => conn.edges.map(edge => edge.node)
   }
 }

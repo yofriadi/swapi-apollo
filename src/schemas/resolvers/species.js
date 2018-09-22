@@ -7,7 +7,7 @@ const {
 const {
   toGlobalId,
   fromGlobalId,
-  connectionFromArray
+  connectionResolver
 } = require('../../relay')
 
 module.exports = {
@@ -47,9 +47,17 @@ module.exports = {
     eyeColors: ({eye_colors}) => arrayList(eye_colors),
     hairColors: ({hair_colors}) => arrayList(hair_colors),
     skinColors: ({skin_colors}) => arrayList(skin_colors),
-    homeworld: ({homeworld}) => homeworld ? getObjectFromUrl(homeworld) : 'unknown'
+    homeworld: ({homeworld}) => homeworld ? getObjectFromUrl(homeworld) : 'unknown',
+    personConnection: (obj, args) => connectionResolver('people', obj, args),
+    filmConnection: (obj, args) => connectionResolver('films', obj, args)
   },
   SpeciesConnection: {
     species: conn => conn.edges.map(edge => edge.node)
+  },
+  SpeciesPeopleConnection: {
+    people: conn => conn.edges.map(edge => edge.node)
+  },
+  SpeciesFilmsConnection: {
+    films: conn => conn.edges.map(edge => edge.node)
   }
 }

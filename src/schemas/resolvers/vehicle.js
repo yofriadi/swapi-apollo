@@ -6,7 +6,7 @@ const {
 const {
   toGlobalId,
   fromGlobalId,
-  connectionFromArray
+  connectionResolver
 } = require('../../relay')
 
 module.exports = {
@@ -45,9 +45,17 @@ module.exports = {
     manufacturers: ({manufacturer}) => arrayList(manufacturer),
     costInCredits: ({cost_in_credits}) => cost_in_credits,
     maxAtmospheringSpeed: ({max_atmosphering_speed}) => max_atmosphering_speed,
-    cargoCapacity: ({cargo_capacity}) => cargo_capacity
+    cargoCapacity: ({cargo_capacity}) => cargo_capacity,
+    pilotConnection: (obj, args) => connectionResolver('pilots', obj, args),
+    filmConnection: (obj, args) => connectionResolver('films', obj, args)
   },
   VehiclesConnection: {
     vehicles: conn => conn.edges.map(edge => edge.node)
+  },
+  VehiclePilotsConnection: {
+    pilots: conn => conn.edges.map(edge => edge.node)
+  },
+  VehicleFilmsConnection: {
+    films: conn => conn.edges.map(edge => edge.node)
   }
 }
