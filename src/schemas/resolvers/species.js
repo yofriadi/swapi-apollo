@@ -1,18 +1,16 @@
 const {
-  getObjectFromTypeAndId,
-  arrayList,
-  getObjectFromUrl,
-  getObjectsByType
+  arrayList
 } = require('../../helpers')
 const {
   toGlobalId,
   fromGlobalId,
+  connectionFromArray,
   connectionResolver
 } = require('../../relay')
 
 module.exports = {
   Query: {
-    species: (_, {id, speciesID}) => {
+    species: (_, {id, speciesID}, {dataSources: {SWAPI}}) => {
       if (id !== undefined && id !== null) {
         const {type, id: globalId} = fromGlobalId(id);
 
@@ -23,17 +21,17 @@ module.exports = {
         ) {
           throw new Error(`No valid ID extracted from ${id}`)
         }
-        return getObjectFromTypeAndId(type, globalId)
+        return SWAPI.getData(type, globalId)
       }
 
       if (speciesID !== undefined && speciesID !== null) {
-        return getObjectFromTypeAndId('species', speciesID)
+        return SWAPI.getData('species', speciesID)
       }
 
       throw new Error('must provide id or speciesID')
     },
-    allSpecies: async (_, args) => {
-      const {objects, totalCount} = await getObjectsByType('species')
+    allSpecies: async (_, args, {dataSources: {SWAPI}}) => {
+      const {objects, totalCount} = await SWAPI.getAllData('species')
       return {
         totalCount,
         ...connectionFromArray(objects, args)
@@ -47,9 +45,12 @@ module.exports = {
     eyeColors: ({eye_colors}) => arrayList(eye_colors),
     hairColors: ({hair_colors}) => arrayList(hair_colors),
     skinColors: ({skin_colors}) => arrayList(skin_colors),
-    homeworld: ({homeworld}) => homeworld ? getObjectFromUrl(homeworld) : 'unknown',
-    personConnection: (obj, args) => connectionResolver('people', obj, args),
-    filmConnection: (obj, args) => connectionResolver('films', obj, args)
+    homeworld: ({homeworld}, _, {dataSources: {SWAPI}}) =>
+      SWAPI.getData(homeworld.split('/')[4], homeworld.split('/')[5]),
+    personConnection: (obj, args, {dataSources}) =>
+      connectionResolver('people', obj, args, dataSources),
+    filmConnection: (obj, args, {dataSources}) =>
+      connectionResolver('films', obj, args, dataSources)
   },
   SpeciesConnection: {
     species: conn => conn.edges.map(edge => edge.node)

@@ -10,13 +10,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "apollo-datasource-rest": "^0.1.5",
     "apollo-server": "^2.0.5",
     "dataloader": "^1.4.0",
     "graphql": "^14.0.0",
     "graphql-relay": "^0.5.5",
     "lodash": "^4.17.10",
-    "merge-graphql-schemas": "^1.5.3",
-    "node-fetch": "^2.2.0"
+    "merge-graphql-schemas": "^1.5.3"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"

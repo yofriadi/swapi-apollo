@@ -1,17 +1,16 @@
 const {
-  getObjectFromTypeAndId,
-  arrayList,
-  getObjectsByType
+  arrayList
 } = require('../../helpers')
 const {
   toGlobalId,
   fromGlobalId,
+  connectionFromArray,
   connectionResolver
 } = require('../../relay')
 
 module.exports = {
   Query: {
-    planet: (_, {id, planetID}) => {
+    planet: (_, {id, planetID}, {dataSources: {SWAPI}}) => {
       if (id !== undefined && id !== null) {
         const {type, id: globalId} = fromGlobalId(id);
 
@@ -22,17 +21,17 @@ module.exports = {
         ) {
           throw new Error(`No valid ID extracted from ${id}`)
         }
-        return getObjectFromTypeAndId(type, globalId)
+        return SWAPI.getData(type, globalId)
       }
 
       if (planetID !== undefined && planetID !== null) {
-        return getObjectFromTypeAndId('planets', planetID)
+        return SWAPI.getData('planets', planetID)
       }
 
       throw new Error('must provide id or planetID')
     },
-    allPlanets: async (_, args) => {
-      const {objects, totalCount} = await getObjectsByType('planets')
+    allPlanets: async (_, args, {dataSources: {SWAPI}}) => {
+      const {objects, totalCount} = await SWAPI.getAllData('planets')
       return {
         totalCount,
         ...connectionFromArray(objects, args)
@@ -46,8 +45,10 @@ module.exports = {
     climates: ({climate}) => arrayList(climate),
     terrains: ({terrain}) => arrayList(terrain),
     surfaceWater: ({surface_water}) => surface_water,
-    residentConnection: (obj, args) => connectionResolver('residents', obj, args),
-    filmConnection: (obj, args) => connectionResolver('films', obj, args)
+    residentConnection: (obj, args, {dataSources}) =>
+      connectionResolver('residents', obj, args, dataSources),
+    filmConnection: (obj, args, {dataSources}) =>
+      connectionResolver('films', obj, args, dataSources)
   },
   PlanetsConnection: {
     planets: conn => conn.edges.map(edge => edge.node)

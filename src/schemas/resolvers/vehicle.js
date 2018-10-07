@@ -1,17 +1,16 @@
 const {
-  getObjectFromTypeAndId,
-  arrayList,
-  getObjectsByType
+  arrayList
 } = require('../../helpers')
 const {
   toGlobalId,
   fromGlobalId,
+  connectionFromArray,
   connectionResolver
 } = require('../../relay')
 
 module.exports = {
   Query: {
-    vehicle: (_, {id, vehicleID}) => {
+    vehicle: (_, {id, vehicleID}, {dataSources: {SWAPI}}) => {
       if (id !== undefined && id !== null) {
         const {type, id: globalId} = fromGlobalId(id);
 
@@ -22,17 +21,17 @@ module.exports = {
         ) {
           throw new Error(`No valid ID extracted from ${id}`)
         }
-        return getObjectFromTypeAndId(type, globalId)
+        return SWAPI.getData(type, globalId)
       }
 
       if (vehicleID !== undefined && vehicleID !== null) {
-        return getObjectFromTypeAndId('vehicles', vehicleID)
+        return SWAPI.getData('vehicles', vehicleID)
       }
 
       throw new Error('must provide id or vehicleID')
     },
-    allVehicles: async (_, args) => {
-      const {objects, totalCount} = await getObjectsByType('vehicles')
+    allVehicles: async (_, args, {dataSources: {SWAPI}}) => {
+      const {objects, totalCount} = await SWAPI.getAllData('vehicles')
       return {
         totalCount,
         ...connectionFromArray(objects, args)
@@ -46,8 +45,10 @@ module.exports = {
     costInCredits: ({cost_in_credits}) => cost_in_credits,
     maxAtmospheringSpeed: ({max_atmosphering_speed}) => max_atmosphering_speed,
     cargoCapacity: ({cargo_capacity}) => cargo_capacity,
-    pilotConnection: (obj, args) => connectionResolver('pilots', obj, args),
-    filmConnection: (obj, args) => connectionResolver('films', obj, args)
+    pilotConnection: (obj, args, {dataSources}) =>
+      connectionResolver('pilots', obj, args, dataSources),
+    filmConnection: (obj, args, {dataSources}) =>
+      connectionResolver('films', obj, args, dataSources)
   },
   VehiclesConnection: {
     vehicles: conn => conn.edges.map(edge => edge.node)

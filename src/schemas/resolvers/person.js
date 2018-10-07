@@ -1,17 +1,13 @@
 const {
-  getObjectFromTypeAndId,
-  getObjectFromUrl,
-  getObjectsByType
-} = require('../../helpers')
-const {
   toGlobalId,
   fromGlobalId,
+  connectionFromArray,
   connectionResolver
 } = require('../../relay')
 
 module.exports = {
   Query: {
-    person: (_, {id, personID}) => {
+    person: (_, {id, personID}, {dataSources: {SWAPI}}) => {
       if (id !== undefined && id !== null) {
         const {type, id: globalId} = fromGlobalId(id)
 
@@ -23,17 +19,17 @@ module.exports = {
           throw new Error(`No valid ID extracted from ${id}`)
         }
 
-        return getObjectFromTypeAndId(type, globalId)
+        return SWAPI.getData(type, globalId)
       }
 
       if (personID !== undefined && personID !== null) {
-        return getObjectFromTypeAndId('people', personID)
+        return SWAPI.getData('people', personID)
       }
 
       throw new Error('must provide id or personID')
     },
-    allPeople: async (_, args) => {
-      const {objects, totalCount} = await getObjectsByType('people')
+    allPeople: async (_, args, {dataSources: {SWAPI}}) => {
+      const {objects, totalCount} = await SWAPI.getAllData('people')
       return {
         totalCount,
         ...connectionFromArray(objects, args)
@@ -46,11 +42,16 @@ module.exports = {
     eyeColor: ({eye_color}) => eye_color,
     hairColor: ({hair_color}) => hair_color,
     skinColor: ({skin_color}) => skin_color,
-    homeworld: ({homeworld}) => getObjectFromUrl(homeworld),
-    species: ({species}) => getObjectFromUrl(species),
-    filmConnection: (obj, args) => connectionResolver('films', obj, args),
-    starshipConnection: (obj, args) => connectionResolver('starships', obj, args),
-    vehicleConnection: (obj, args) => connectionResolver('vehicles', obj, args)
+    homeworld: ({homeworld}, _, {dataSources: {SWAPI}}) =>
+      SWAPI.getData(homeworld.split('/')[4], homeworld.split('/')[5]),
+    species: ({species}, _, {dataSources: {SWAPI}}) =>
+      SWAPI.getData(species[0].split('/')[4], species[0].split('/')[5]),
+    filmConnection: (obj, args, {dataSources}) =>
+      connectionResolver('films', obj, args, dataSources),
+    starshipConnection: (obj, args, {dataSources}) =>
+      connectionResolver('starships', obj, args, dataSources),
+    vehicleConnection: (obj, args, {dataSources}) =>
+      connectionResolver('vehicles', obj, args, dataSources)
   },
   PeopleConnection: {
     people: conn => conn.edges.map(edge => edge.node)

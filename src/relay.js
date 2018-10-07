@@ -210,8 +210,8 @@ const connectionArgs = `
   before: String
   last: Int
 `
-const connectionResolver = async (name, obj, args) => {
-  const array = await getObjectsFromUrls(obj[name])
+const connectionResolver = async (name, obj, args, dataSources) => {
+  const array = await getObjectsFromUrls(obj[name], dataSources)
   return {
     totalCount: array.length,
     ...connectionFromArray(array, args)

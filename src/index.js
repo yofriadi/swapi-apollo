@@ -1,6 +1,7 @@
 const {ApolloServer} = require('apollo-server');
 
 const schema = require('./schemas')
+const SWAPI = require('./api')
 
 const playground = {
   settings: {
@@ -13,6 +14,7 @@ const playground = {
 
 const server = new ApolloServer({
   schema,
+  dataSources: () => ({ SWAPI: new SWAPI() }),
   tracing: true,
   playground
 });
